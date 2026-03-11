@@ -9,9 +9,6 @@ services:
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pgdata:/var/lib/postgresql/data
 
-    networks:
-      - saas-network
-
   backend:
     build: ./backend
 
@@ -22,8 +19,6 @@ services:
       PORT: 3000
     depends_on:
       - db
-    networks:
-      - saas-network
 
   frontend:
     build: ./frontend
@@ -32,8 +27,6 @@ services:
       VITE_API_URL: http://localhost:3000
     depends_on:
       - backend
-    networks:
-      - saas-network
 
 networks:
   saas-network:
