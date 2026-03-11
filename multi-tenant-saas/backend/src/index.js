@@ -1,0 +1,26 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const tenantMiddleware = require('./middleware/tenant');
+const authRoutes = require('./routes/auth');
+const dashboardRoutes = require('./routes/dashboard');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+
+// WHY: Global tenant middleware handles subdomain/header detection early.
+app.use(tenantMiddleware);
+
+app.get('/', (req, res) => {
+    res.json({ message: 'Multi-tenant API is running', tenant: req.tenantSlug || 'None' });
+});
+
+app.use('/api', authRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
