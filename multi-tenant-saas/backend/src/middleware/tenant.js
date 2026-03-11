@@ -3,15 +3,18 @@
 
 const tenantMiddleware = (req, res, next) => {
     const host = req.hostname;
-    const subdomain = host.split('.')[0];
+  const subdomain = host.split('.')[0];
+  const baseDomain = process.env.BASE_DOMAIN || 'localhost';
+  
+  // WHY: We need to ignore the main domain and specific administrative subdomains (like 'mfrontend' or 'api').
+  const isMainDomain = host === baseDomain || host.endsWith(`.${baseDomain}`);
+  const reservedSubdomains = ['localhost', 'backend', 'www', 'api', 'mfrontend'];
 
-    // WHY: In local Docker, 'localhost' is the hostname. We use 'x-tenant-slug' header as a fallback.
-    // In production, 'acme.myapp.com' would yield 'acme'.
-    let tenantSlug = (subdomain !== 'localhost' && subdomain !== 'backend' && subdomain !== 'www')
-        ? subdomain
-        : req.headers['x-tenant-slug'];
+  let tenantSlug = (!reservedSubdomains.includes(subdomain) && host !== baseDomain) 
+    ? subdomain 
+    : req.headers['x-tenant-slug'];
 
-    if (!tenantSlug && (req.path === '/api/signup' || req.path === '/api/login' || req.path === '/')) {
+    if (!tenantSlug && (req.path.includes('/signup') || req.path.includes('/login') || req.path === '/')) {
         // Shared public routes don't necessarily need a tenant slug immediately
         return next();
     }
