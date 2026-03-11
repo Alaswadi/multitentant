@@ -6,9 +6,13 @@ const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://mfrontend.phishsimulator.com', /\.phishsimulator\.com$/],
+  credentials: true
+}));
 app.use(express.json());
 
 // WHY: Global tenant middleware handles subdomain/header detection early.

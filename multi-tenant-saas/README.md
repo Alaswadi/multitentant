@@ -50,6 +50,16 @@ Run these commands:
 You can use `lvh.me` which points to `127.0.0.1`.
 Visit `http://acme-corp.lvh.me:5173`. The application will automatically detect the tenant from the URL!
 
+## Deployment Notes (e.g. Coolify)
+
+When deploying to production environments like Coolify:
+
+1. **Vite Host**: Vite 6+ requires `server.allowedHosts` to be set. We've added a [vite.config.js](file:///c:/Users/fadia/Documents/augment-projects/multitentant/multi-tenant-saas/frontend/vite.config.js) that allows all hosts.
+2. **Proxy Headers**: Behind a load balancer/proxy (like Coolify's Traefik), Express needs `app.set('trust proxy', true)` to correctly read `req.hostname` and `req.ip`. This is enabled in [index.js](file:///c:/Users/fadia/Documents/augment-projects/multitentant/multi-tenant-saas/backend/src/index.js).
+3. **Environment Variables**:
+   - Set `VITE_API_URL` in your frontend container to your public backend URL (e.g., `https://api.phishsimulator.com`).
+   - Set `DATABASE_URL` and `JWT_SECRET` in your backend container.
+
 ---
 
 **Code Style**: This project uses clean, modular code with `// WHY:` comments explaining key architectural decisions.
