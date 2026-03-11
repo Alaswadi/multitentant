@@ -14,8 +14,7 @@ services:
 
   backend:
     build: ./backend
-    ports:
-      - "3000:3000"
+
     environment:
       DATABASE_URL: postgres://postgres:postgres@db:5432/saas
       JWT_SECRET: supersecretkey
@@ -28,8 +27,7 @@ services:
 
   frontend:
     build: ./frontend
-    ports:
-      - "5173:5173"
+
     environment:
       VITE_API_URL: http://localhost:3000
     depends_on:
