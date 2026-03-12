@@ -4,10 +4,14 @@ const cors = require('cors');
 const tenantMiddleware = require('./middleware/tenant');
 const authRoutes = require('./routes/auth');
 const dashboardRoutes = require('./routes/dashboard');
+const { pool, initializeDatabase } = require('./services/tenantProvisioner');
 
 const app = express();
 app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
+
+// Initialize base tables
+initializeDatabase();
 
 app.use(cors({
   origin: ['http://localhost:5173', 'https://mfrontend.phishsimulator.com', /\.phishsimulator\.com$/],

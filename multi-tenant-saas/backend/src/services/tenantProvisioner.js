@@ -31,7 +31,43 @@ async function provisionTenant(client, slug) {
   return schemaName;
 }
 
+/**
+ * Initializes the public registry tables if they do not exist.
+ * This is useful for environments like Coolify where init.sql might not run.
+ */
+async function initializeDatabase() {
+  const client = await pool.connect();
+  try {
+    console.log('Verifying database initialization...');
+    await client.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
+    
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS public.tenants (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        slug VARCHAR(63) UNIQUE NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS public.users (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        email VARCHAR(255) NOT NULL,
+        password_hash TEXT NOT NULL,
+        tenant_id UUID REFERENCES public.tenants(id),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(email, tenant_id)
+      );
+    `);
+    console.log('Database initialization complete.');
+  } catch (err) {
+    console.error('Database initialization failed:', err);
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   pool,
-  provisionTenant
+  provisionTenant,
+  initializeDatabase
 };
