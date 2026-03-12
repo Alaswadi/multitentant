@@ -4,6 +4,7 @@ import axios from 'axios';
 const getClient = (tenantSlug) => {
     const token = localStorage.getItem('token');
 
+    console.log('API Client initialized with URL:', import.meta.env.VITE_API_URL);
     return axios.create({
         baseURL: import.meta.env.VITE_API_URL,
         headers: {
