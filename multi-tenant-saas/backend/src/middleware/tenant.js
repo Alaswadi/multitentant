@@ -8,9 +8,10 @@ const tenantMiddleware = (req, res, next) => {
   
   // WHY: We need to ignore the main domain and specific administrative subdomains (like 'mfrontend' or 'api').
   const isMainDomain = host === baseDomain || host.endsWith(`.${baseDomain}`);
-  const reservedSubdomains = ['localhost', 'backend', 'www', 'api', 'mfrontend'];
+  // WHY: We need to ignore administrative subdomains so they aren't treated as tenants.
+  const reservedSubdomains = ['localhost', 'backend', 'mbackend', 'frontend', 'mfrontend', 'www', 'api'];
 
-  let tenantSlug = (!reservedSubdomains.includes(subdomain) && host !== baseDomain) 
+  let tenantSlug = (!reservedSubdomains.includes(subdomain) && host !== baseDomain && !host.includes('mbackend')) 
     ? subdomain 
     : req.headers['x-tenant-slug'];
 
