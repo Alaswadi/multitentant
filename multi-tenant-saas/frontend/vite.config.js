@@ -10,5 +10,10 @@ export default defineConfig({
     // WHY: Vite 6+ blocks unknown hosts by default for security. 
     // We allow all hosts here so it works seamlessly behind proxies like Coolify/Nginx.
     allowedHosts: true 
+  },
+  define: {
+    // WHY: Sometimes Docker/Coolify env variables aren't picked up by import.meta.env.
+    // This explicitly defines them for the client.
+    'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL)
   }
 });
